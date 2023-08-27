@@ -142,16 +142,17 @@ def overall_records_page(data):
 
 def visualize_data(data):
     # Define custom colors for each section
-    custom_colors = {
-        "primary_data_count": "green",
-        "missing_data_count": "red",
-        "proxy_data_count": "yellow"
-    }
+
     # Create Pie chart
     fig = px.pie(values=[data.primary_data_count.iloc[0], data.missing_data_count.iloc[0],
                          data.proxy_data_count.iloc[0]],
                  names=["primary_data_count", "missing_data_count", "proxy_data_count"],
-                 color_discrete_map=custom_colors)
+                 color=["primary_data_count", "missing_data_count", "proxy_data_count"],
+                 color_discrete_map={
+                     "primary_data_count": "green",
+                     "missing_data_count": "crimson",
+                     "proxy_data_count": "orange"
+                 })
 
     st.plotly_chart(fig, use_container_width=True)
 
