@@ -1,0 +1,41 @@
+import pandas as pd
+
+
+class DataHeathCheck:
+    def __init__(self, data_path):
+        self.original_data = pd.read_excel(data_path, sheet_name="Original data")
+        self.processed_data = pd.read_excel(data_path, sheet_name="Processed and completed data")
+        self.columns_to_exclude = ['DR code', 'GTIN', 'packaging_weight_unit', 'product_weight_unit_original',
+                                   'product_weight_unit', 'Material percentage check']
+        self.columns_to_include = [cols for cols in self.original_data.columns if cols not in self.columns_to_exclude]
+
+    def _verify_data(self):
+        assert self.original_data['GTIN'].equals(self.processed_data['GTIN']), "Original Data GTIN values are not " \
+                                                                               "same as processed values"
+
+    # Define a function to get non-null column names for a row
+    def get_non_null_columns(self, row):
+        return set(row.index[row.notna()])
+
+    # Define a function to get non-null column names for a row
+    def get_null_columns(self, row):
+        return set(row.index[row.isna()])
+
+    def calculate_health_check(self):
+        # Verify if the original data and processed data have same GTIN values to process
+        self._verify_data()
+
+        self.processed_data['primary_data_count'] = self.original_data[self.columns_to_include].count(
+            axis=1)  # .apply(lambda x : x.count(), axis=1)
+        self.processed_data['missing_data_count'] = self.processed_data[self.columns_to_include].isna().sum(
+            axis=1)  # .apply(lambda x : x.isna().sum(), axis=1)
+        self.processed_data['proxy_data_count'] = len(self.columns_to_include) \
+                                                  - self.processed_data['primary_data_count'] \
+                                                  - self.processed_data['missing_data_count']
+        # Apply the function to each row
+        self.processed_data['primary_data_columns'] = self.original_data.apply(self.get_non_null_columns, axis=1)
+        self.processed_data['missing_data_columns'] = self.original_data.apply(self.get_null_columns, axis=1)
+        self.processed_data['proxy_columns'] = set(self.columns_to_include) - self.processed_data[
+            'primary_data_columns'] - self.processed_data['missing_data_columns']
+
+        return self.processed_data
