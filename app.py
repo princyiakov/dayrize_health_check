@@ -103,30 +103,26 @@ import plotly.express as px
 
 def main():
     st.title("Data Visualization App")
-
-    # Display the Upload File section
-    data = upload_page()
-
-    # Create tabs for navigation between Individual Records and Overall Records
-    tabs = ["Individual Records", "Overall Records"]
-    active_tab = st.radio("Select a page", tabs)
-
-    if active_tab == "Individual Records":
-        individual_records_page(data)
-    elif active_tab == "Overall Records":
-        overall_records_page(data)
-
-
-def upload_page():
     st.title("Upload File")
     uploaded_file = st.file_uploader("Upload your excel file", type=["xlsx"])
 
     if uploaded_file is not None:
         st.success("File Uploaded Successfully")
+        # Display the Upload File section
         dhc = DataHeathCheck(uploaded_file)
-        verified_data = dhc.calculate_health_check()
+        data = dhc.calculate_health_check()
 
-    return verified_data
+        # Create tabs for navigation between Individual Records and Overall Records
+        tabs = ["Individual Records", "Overall Records"]
+        active_tab = st.radio("Select a page", tabs)
+
+        if active_tab == "Individual Records":
+            individual_records_page(data)
+        elif active_tab == "Overall Records":
+            overall_records_page(data)
+
+    else:
+        st.info("Please upload a Excel File to proceed")
 
 
 def individual_records_page(data):
@@ -145,9 +141,7 @@ def overall_records_page(data):
 
 
 def visualize_data(data):
-
-
-# Define custom colors for each section
+    # Define custom colors for each section
     custom_colors = {
         "primary_data_count": "green",
         "missing_data_count": "red",
