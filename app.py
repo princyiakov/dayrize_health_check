@@ -26,7 +26,8 @@ def main():
         if active_tab == "Overall Records":
             # Calculate and display comparison data for overall records
             comparison_data = dhc.create_comparison_df()
-            visualise_overall_records(comparison_data)
+            _, processed_data = dhc.get_data()
+            visualise_overall_records(comparison_data, processed_data)
         elif active_tab == "Individual Records":
             # Calculate health check data for individual records and display it
             data = dhc.calculate_health_check()
@@ -48,7 +49,7 @@ def individual_records_page(data):
 
 
 # Function to visualize overall records
-def visualise_overall_records(data):
+def visualise_overall_records(data, processed_data):
     st.title("Overall Records Visualization")
     st.title("Null Value Comparison")  # Title for null value comparison section
 
@@ -64,6 +65,16 @@ def visualise_overall_records(data):
         width=1000  # Adjust the width
     )
     st.plotly_chart(fig, use_container_width=True)
+
+    cat_cols = ['Brand','Item Type', 'COP',
+                'Certification', 'material_1_name',
+                'material_2_name', 'material_3_name',
+                'Location of origin', 'Location of destination', 'Transport mode']
+    for cols in cat_cols:
+        cat_col_counts = processed_data[cols].value_counts()
+        count_bar = px.bar(x=cat_col_counts.index, y=cat_col_counts.values)
+        count_bar.update_layout(xaxis_title=str(cols), yaxis_title="Count")
+        st.plotly_chart(count_bar, use_container_width=True)
 
 
 # Function to visualize individual record data
