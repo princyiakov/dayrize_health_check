@@ -27,7 +27,9 @@ def main():
             # Calculate and display comparison data for overall records
             comparison_data = dhc.create_comparison_df()
             _, processed_data = dhc.get_data()
-            visualise_overall_records(comparison_data, processed_data)
+            data_with_health_check = dhc.calculate_health_check()
+            visualise_overall_records(comparison_data, processed_data, data_with_health_check)
+
         elif active_tab == "Individual Records":
             # Calculate health check data for individual records and display it
             data = dhc.calculate_health_check()
@@ -49,24 +51,40 @@ def individual_records_page(data):
 
 
 # Function to visualize overall records
-def visualise_overall_records(data, processed_data):
+def visualise_overall_records(data, processed_data, data_with_health_check):
     st.title("Overall Records Visualization")
-    st.title("Null Value Comparison")  # Title for null value comparison section
 
+    st.title("Average Primary, Proxy and Missing Data Distribution")
+    map_colours = {"primary_data_average_count": "green",
+                   "missing_data_average_count": "crimson",
+                   "proxy_data_average_count": "orange"
+                   }
+    labels = ["primary_data_average_count", "missing_data_average_count", "proxy_data_average_count"]
+    # Overall data count
+    fig_1 = px.pie(values=[data_with_health_check["primary_data_count"].mean(),
+                           data_with_health_check["missing_data_count"].mean(),
+                           data_with_health_check["proxy_data_count"].mean()],
+                   names=labels,
+                   color=labels,
+                   color_discrete_map=map_colours)
+    st.plotly_chart(fig_1, use_container_width=True)
+
+    st.title("Null Value Comparison of Original Data vs Processed Data")  # Title for null value comparison section
     # Create a horizontal bar chart using Plotly Express
-    fig = px.bar(data,
-                 orientation='h',
-                 labels={'index': 'Columns'},
-                 template='plotly_dark')
-    fig.update_layout(barmode='stack')
-    fig.update_layout(
+    fig_2 = px.bar(data,
+                   orientation='h',
+                   labels={'index': 'Columns'},
+                   template='plotly_dark')
+    fig_2.update_layout(barmode='stack')
+    fig_2.update_layout(
         barmode='stack',
         height=1000,  # Adjust the height
         width=1000  # Adjust the width
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig_2, use_container_width=True)
 
-    cat_cols = ['Brand','Item Type', 'COP',
+    st.title("Data Distribution Across Major Categorical Values")
+    cat_cols = ['Brand', 'Item Type', 'COP',
                 'Certification', 'material_1_name',
                 'material_2_name', 'material_3_name',
                 'Location of origin', 'Location of destination', 'Transport mode']

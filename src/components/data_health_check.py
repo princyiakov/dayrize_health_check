@@ -90,16 +90,16 @@ class DataHeathCheck:
     def create_comparison_df(self):
         # Calculate the percentage of null values for both DataFrames
         self._verify_data()
-        org_data_null_percent = (self.original_data.isnull().sum() / len(self.original_data)) * 100
+        original_data_null_percent = (self.original_data.isnull().sum() / len(self.original_data)) * 100
         processed_data_null_percent = (self.processed_data.isnull().sum() / len(self.processed_data)) * 100
 
         # Create a new DataFrame to store the null value percentages
         comparison_df = pd.DataFrame({
-            'org_data_null_percent': org_data_null_percent,
+            'original_data_null_percent': original_data_null_percent,
             'processed_data_null_percent': processed_data_null_percent,
         })
         comparison_df.fillna(0, inplace=True)
-        comparison_df['total_null'] = comparison_df['org_data_null_percent'] + comparison_df[
+        comparison_df['total_null'] = comparison_df['original_data_null_percent'] + comparison_df[
             'processed_data_null_percent']
         comparison_df = comparison_df.sort_values(by='total_null', ascending=False)
         comparison_df.drop('total_null', inplace=True, axis=1)
