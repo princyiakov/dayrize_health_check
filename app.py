@@ -51,11 +51,11 @@ def individual_records_page(data):
 
 
 # Function to visualize overall records
-def visualise_overall_records(data, processed_data, data_with_health_check):
+def visualise_overall_records(comparison_data, processed_data, data_with_health_check):
     st.title("Overall Records Visualization")
 
     visualise_average_primary_proxy_missing_piechart(data_with_health_check)
-    visualise_null_value_distribution(data)
+    visualise_null_value_distribution(comparison_data)
     visualise_categorical_value_distribution(processed_data)
 
 
