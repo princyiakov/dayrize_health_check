@@ -2,6 +2,8 @@
 import streamlit as st
 from src.components.data_health_check import DataHeathCheck  # Importing a custom module
 import plotly.express as px
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
 
 
 # Define the main function
@@ -105,14 +107,7 @@ def visualise_average_primary_proxy_missing_piechart(data_with_health_check):
     st.plotly_chart(fig_1, use_container_width=True)
 
 
-# Function to visualize individual record data
-def visualize_single_data(data):
-    map_colours = {"primary_data_count": "green",
-                   "missing_data_count": "crimson",
-                   "proxy_data_count": "orange"
-                   }
-    labels = ["primary_data_count", "missing_data_count", "proxy_data_count"]
-
+def visualize_single_piechart_columns(data, map_colours, labels):
     # Create a pie chart using Plotly Express
     fig = px.pie(values=[data.primary_data_count.iloc[0], data.missing_data_count.iloc[0],
                          data.proxy_data_count.iloc[0]],
@@ -120,7 +115,6 @@ def visualize_single_data(data):
                  color=labels,
                  color_discrete_map=map_colours)
     st.plotly_chart(fig, use_container_width=True)
-
     # Display primary data columns
     primary_columns = ", ".join(list(data["primary_data_columns"].iloc[0]))
     st.markdown(
@@ -130,7 +124,6 @@ def visualize_single_data(data):
         '</div>',
         unsafe_allow_html=True
     )
-
     # Display proxy data columns
     proxy_columns = ", ".join(list(data["proxy_data_columns"].iloc[0]))
     st.markdown(
@@ -140,7 +133,6 @@ def visualize_single_data(data):
         '</div>',
         unsafe_allow_html=True
     )
-
     # Display missing data columns
     missing_columns = ", ".join(list(data["missing_data_columns"].iloc[0]))
     st.markdown(
@@ -150,6 +142,44 @@ def visualize_single_data(data):
         '</div>',
         unsafe_allow_html=True
     )
+
+
+def visualize_dimensions(data, map_colours, labels):
+    fig = make_subplots(rows=1, cols=2, specs=[[{"type": "pie"}, {"type": "pie"}]])
+
+    # Create the first pie chart
+    fig.add_trace(go.Pie(
+        values=[len(data.climate_primary.iloc[0]), len(data.climate_missing.iloc[0]),
+                len(data.climate_proxy.iloc[0])],
+        labels=labels,
+        title='Climate Impact Dimension',
+        domain=dict(x=[0, 0.5]),
+        marker=dict(colors=list(map_colours.values())),
+    ), row=1, col=1)
+
+    # Create the second pie chart
+    fig.add_trace(go.Pie(
+        values=[len(data.circularity_primary.iloc[0]), len(data.circularity_missing.iloc[0]),
+                len(data.circularity_proxy.iloc[0])],
+        labels=labels,
+        title='Circularity Dimension',
+        domain=dict(x=[0.5, 1.0]),
+        marker=dict(colors=list(map_colours.values())),
+    ), row=1, col=2)
+    #fig.update_traces(marker=dict(colors=['blue', 'red', 'green']))
+    fig.update_layout(height=600, width=800, title_text="Dimension Visualisation")
+    st.plotly_chart(fig, use_container_width=True)
+
+
+# Function to visualize individual record data
+def visualize_single_data(data):
+    map_colours = {"primary_data_count": "green",
+                   "missing_data_count": "crimson",
+                   "proxy_data_count": "orange"
+                   }
+    labels = ["primary_data_count", "missing_data_count", "proxy_data_count"]
+    visualize_single_piechart_columns(data, map_colours, labels)
+    visualize_dimensions(data, map_colours, labels)
 
 
 # Entry point of the program
