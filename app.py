@@ -26,7 +26,7 @@ def main():
         if active_tab == "Overall Records":
             # Calculate and display comparison data for overall records
             comparison_data = dhc.create_comparison_df()
-            _, processed_data = dhc.get_data()
+            _, processed_data = dhc.get_raw_data()
             data_with_health_check = dhc.calculate_health_check()
             visualise_overall_records(comparison_data, processed_data, data_with_health_check)
 
