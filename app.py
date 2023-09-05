@@ -167,8 +167,6 @@ def visualize_dimensions(data, map_colours, labels):
         domain=dict(x=[0.5, 1.0]),
         marker=dict(colors=list(map_colours.values())),
     ), row=1, col=2)
-    # fig.update_layout(height=600, width=800, title_text="Dimension Visualisation")
-    # st.plotly_chart(fig, use_container_width=True)
 
     # Create the third pie chart
     fig.add_trace(go.Pie(
@@ -202,7 +200,6 @@ def visualize_single_data(data):
                    }
     labels = list(map_colours.keys())
 
-    #st.subheader(f"1. Based on Primary, Proxy and Missing Data")
     visualize_single_piechart_columns(data, map_colours, labels)
 
     st.subheader(f"Dimension Visualisation")
