@@ -63,10 +63,10 @@ def visualise_overall_records(comparison_data, processed_data, data_with_health_
 
 def visualise_categorical_value_distribution(processed_data):
     st.title("Data Distribution Across Major Categorical Values")
-    cat_cols = ['Brand', 'Item Type', 'COP',
-                'Certification', 'material_1_name',
-                'material_2_name', 'material_3_name',
-                'Location of origin', 'Location of destination', 'Transport mode']
+    cat_cols = ['Brand', 'Item_type', 'Country_of_production',
+                'Certification', 'Product_material_1_name',
+                'Product_material_2_name', 'Product_material_3_name',
+                'Location_of_origin', 'Location_of_destination', 'Transport_mode']
     for cols in cat_cols:
         cat_col_counts = processed_data[cols].value_counts()
         count_bar = px.bar(x=cat_col_counts.index, y=cat_col_counts.values)
@@ -145,7 +145,8 @@ def visualize_single_piechart_columns(data, map_colours, labels):
 
 
 def visualize_dimensions(data, map_colours, labels):
-    fig = make_subplots(rows=1, cols=2, specs=[[{"type": "pie"}, {"type": "pie"}]])
+    fig = make_subplots(rows=2, cols=2, specs=[[{"type": "pie"}, {"type": "pie"}],
+                                               [{"type": "pie"}, {"type": "pie"}]])
 
     # Create the first pie chart
     fig.add_trace(go.Pie(
@@ -166,7 +167,29 @@ def visualize_dimensions(data, map_colours, labels):
         domain=dict(x=[0.5, 1.0]),
         marker=dict(colors=list(map_colours.values())),
     ), row=1, col=2)
-    #fig.update_traces(marker=dict(colors=['blue', 'red', 'green']))
+    # fig.update_layout(height=600, width=800, title_text="Dimension Visualisation")
+    # st.plotly_chart(fig, use_container_width=True)
+
+    # Create the third pie chart
+    fig.add_trace(go.Pie(
+        values=[len(data.ecosystem_primary.iloc[0]), len(data.ecosystem_missing.iloc[0]),
+                len(data.ecosystem_proxy.iloc[0])],
+        labels=labels,
+        title='Ecosystem Dimension',
+        domain=dict(x=[0, 0.5]),
+        marker=dict(colors=list(map_colours.values())),
+    ), row=2, col=1)
+
+    # Create the third pie chart
+    fig.add_trace(go.Pie(
+        values=[len(data.livelihood_primary.iloc[0]), len(data.livelihood_missing.iloc[0]),
+                len(data.livelihood_proxy.iloc[0])],
+        labels=labels,
+        title='Livelihood Dimension',
+        domain=dict(x=[0.5, 1.0]),
+        marker=dict(colors=list(map_colours.values())),
+    ), row=2, col=2)
+
     fig.update_layout(height=600, width=800, title_text="Dimension Visualisation")
     st.plotly_chart(fig, use_container_width=True)
 
@@ -177,8 +200,12 @@ def visualize_single_data(data):
                    "missing_data_count": "crimson",
                    "proxy_data_count": "orange"
                    }
-    labels = ["primary_data_count", "missing_data_count", "proxy_data_count"]
+    labels = list(map_colours.keys())
+
+    #st.subheader(f"1. Based on Primary, Proxy and Missing Data")
     visualize_single_piechart_columns(data, map_colours, labels)
+
+    st.subheader(f"Dimension Visualisation")
     visualize_dimensions(data, map_colours, labels)
 
 
