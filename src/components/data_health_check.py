@@ -27,7 +27,6 @@ class DataHeathCheck:
         self.processed_data = pd.read_excel(data_path, sheet_name="Processed and completed data")
         self.data_points = pd.read_excel(data_path, sheet_name="full datapoints")
         self.dimension = ["circularity", "climate", "ecosystem", "livelihood"]
-        # self.required_columns = [col for col in self.data_points if not col.startswith(("Product_material","Packaging_material"))]
 
     # Function to select relevant columns for processing based on row data
     def _select_columns(self, row):
@@ -59,7 +58,8 @@ class DataHeathCheck:
             packaging_percentage = f'packaging_material_{j}_percentage'
             if not pd.isna(row[packaging_material]):
                 columns_to_include.extend(
-                    [packaging_material, packaging_weight, packaging_characteristic, packaging_country, packaging_percentage])
+                    [packaging_material, packaging_weight, packaging_characteristic, packaging_country,
+                     packaging_percentage])
         return columns_to_include
 
     # Verify that original data GTIN values match processed data GTIN values
@@ -92,7 +92,8 @@ class DataHeathCheck:
         circularity_data_points = self.data_points.Datapoint_required[self.data_points["Circularity"] == "Yes"]
         climate_data_points = self.data_points.Datapoint_required[self.data_points["Climate Impact"] == "Yes"]
         ecosystem_data_points = self.data_points.Datapoint_required[self.data_points["Ecosystem Impact"] == "Yes"]
-        liveihood_data_points = self.data_points.Datapoint_required[self.data_points["Livelihoods & Wellbeing"] == "Yes"]
+        liveihood_data_points = self.data_points.Datapoint_required[
+            self.data_points["Livelihoods & Wellbeing"] == "Yes"]
 
         self.processed_data['circularity_all'] = self.processed_data['selected_columns'].apply(
             lambda x: set(x) & set(circularity_data_points))
@@ -124,10 +125,6 @@ class DataHeathCheck:
 
         self._generate_dimension_columns()
         self._generate_dimension_primary_proxy_missing_columns()
-        # # Calculate counts for primary, missing, and proxy data columns
-        # self.processed_data['primary_data_count'] = self.processed_data['primary_data_columns'].apply(lambda x: len(x))
-        # self.processed_data['missing_data_count'] = self.processed_data['missing_data_columns'].apply(lambda x: len(x))
-        # self.processed_data['proxy_data_count'] = self.processed_data['proxy_data_columns'].apply(lambda x: len(x))
 
         return self.processed_data
 
