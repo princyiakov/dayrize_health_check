@@ -96,21 +96,22 @@ def visualise_average_primary_proxy_missing_piechart(data_with_health_check):
                    "missing_data_average_count": "crimson",
                    "proxy_data_average_count": "orange"
                    }
-    labels = ["primary_data_average_count", "missing_data_average_count", "proxy_data_average_count"]
+    labels = list(map_colours.keys())
     # Overall data count
-    fig_1 = px.pie(values=[data_with_health_check["primary_data_count"].mean(),
-                           data_with_health_check["missing_data_count"].mean(),
-                           data_with_health_check["proxy_data_count"].mean()],
+    fig_1 = px.pie(values=[data_with_health_check["primary_data_columns"].apply(len).mean(),
+                           data_with_health_check["missing_data_columns"].apply(len).mean(),
+                           data_with_health_check["proxy_data_columns"].apply(len).mean()],
                    names=labels,
                    color=labels,
                    color_discrete_map=map_colours)
     st.plotly_chart(fig_1, use_container_width=True)
-
+    st.title("Average Primary, Proxy and Missing Data Distribution based on dimensions")
+    visualize_dimensions(data_with_health_check, map_colours, labels, flag="Overall")
 
 def visualize_single_piechart_columns(data, map_colours, labels):
     # Create a pie chart using Plotly Express
-    fig = px.pie(values=[data.primary_data_count.iloc[0], data.missing_data_count.iloc[0],
-                         data.proxy_data_count.iloc[0]],
+    fig = px.pie(values=[len(data.primary_data_columns.iloc[0]), len(data.missing_data_columns.iloc[0]),
+                       len(data.proxy_data_columns.iloc[0])],
                  names=labels,
                  color=labels,
                  color_discrete_map=map_colours)
@@ -144,14 +145,32 @@ def visualize_single_piechart_columns(data, map_colours, labels):
     )
 
 
-def visualize_dimensions(data, map_colours, labels):
+def visualize_dimensions(data, map_colours, labels, flag):
     fig = make_subplots(rows=2, cols=2, specs=[[{"type": "pie"}, {"type": "pie"}],
                                                [{"type": "pie"}, {"type": "pie"}]])
+    values_1 = [len(data.climate_primary.iloc[0]), len(data.climate_missing.iloc[0]),
+                len(data.climate_proxy.iloc[0])] if flag == "Single" \
+        else [data["climate_primary"].apply(len).mean(),data["climate_missing"].apply(len).mean(),
+              data["climate_proxy"].apply(len).mean()]
+
+    values_2 = [len(data.circularity_primary.iloc[0]), len(data.circularity_missing.iloc[0]),
+                len(data.circularity_proxy.iloc[0])] if flag == "Single" \
+        else [data["circularity_primary"].apply(len).mean(),data["circularity_missing"].apply(len).mean(),
+              data["circularity_proxy"].apply(len).mean()]
+
+    values_3 = [len(data.ecosystem_primary.iloc[0]), len(data.ecosystem_missing.iloc[0]),
+                len(data.ecosystem_proxy.iloc[0])] if flag == "Single" \
+        else [data["ecosystem_primary"].apply(len).mean(),data["ecosystem_missing"].apply(len).mean(),
+              data["ecosystem_proxy"].apply(len).mean()]
+
+    values_4 = [len(data.livelihood_primary.iloc[0]), len(data.livelihood_missing.iloc[0]),
+                len(data.livelihood_proxy.iloc[0])] if flag == "Single" \
+        else [data["livelihood_primary"].apply(len).mean(),data["livelihood_missing"].apply(len).mean(),
+              data["livelihood_proxy"].apply(len).mean()]
 
     # Create the first pie chart
     fig.add_trace(go.Pie(
-        values=[len(data.climate_primary.iloc[0]), len(data.climate_missing.iloc[0]),
-                len(data.climate_proxy.iloc[0])],
+        values=values_1,
         labels=labels,
         title='Climate Impact Dimension',
         domain=dict(x=[0, 0.5]),
@@ -160,8 +179,7 @@ def visualize_dimensions(data, map_colours, labels):
 
     # Create the second pie chart
     fig.add_trace(go.Pie(
-        values=[len(data.circularity_primary.iloc[0]), len(data.circularity_missing.iloc[0]),
-                len(data.circularity_proxy.iloc[0])],
+        values=values_2,
         labels=labels,
         title='Circularity Dimension',
         domain=dict(x=[0.5, 1.0]),
@@ -170,8 +188,7 @@ def visualize_dimensions(data, map_colours, labels):
 
     # Create the third pie chart
     fig.add_trace(go.Pie(
-        values=[len(data.ecosystem_primary.iloc[0]), len(data.ecosystem_missing.iloc[0]),
-                len(data.ecosystem_proxy.iloc[0])],
+        values=values_3,
         labels=labels,
         title='Ecosystem Dimension',
         domain=dict(x=[0, 0.5]),
@@ -180,15 +197,14 @@ def visualize_dimensions(data, map_colours, labels):
 
     # Create the third pie chart
     fig.add_trace(go.Pie(
-        values=[len(data.livelihood_primary.iloc[0]), len(data.livelihood_missing.iloc[0]),
-                len(data.livelihood_proxy.iloc[0])],
+        values=values_4,
         labels=labels,
         title='Livelihood Dimension',
         domain=dict(x=[0.5, 1.0]),
         marker=dict(colors=list(map_colours.values())),
     ), row=2, col=2)
 
-    fig.update_layout(height=600, width=800, title_text="Dimension Visualisation")
+    fig.update_layout(height=600, width=800)
     st.plotly_chart(fig, use_container_width=True)
 
 
@@ -203,7 +219,7 @@ def visualize_single_data(data):
     visualize_single_piechart_columns(data, map_colours, labels)
 
     st.subheader(f"Dimension Visualisation")
-    visualize_dimensions(data, map_colours, labels)
+    visualize_dimensions(data, map_colours, labels, flag="Single")
 
 
 # Entry point of the program

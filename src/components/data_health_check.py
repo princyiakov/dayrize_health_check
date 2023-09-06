@@ -35,7 +35,7 @@ class DataHeathCheck:
                               not col.startswith(("Product_material", "packaging_material"))]
         # Count product and packaging material columns
         count_product_material = sum(
-            col.startswith('material_') and col.endswith('_name') for col in self.processed_data.columns)
+            col.startswith('Product_material_') and col.endswith('_name') for col in self.processed_data.columns)
         count_packaging_material = sum(
             col.startswith('packaging_material_') and col.endswith('_characteristic') for col in
             self.processed_data.columns)
@@ -124,10 +124,10 @@ class DataHeathCheck:
 
         self._generate_dimension_columns()
         self._generate_dimension_primary_proxy_missing_columns()
-        # Calculate counts for primary, missing, and proxy data columns
-        self.processed_data['primary_data_count'] = self.processed_data['primary_data_columns'].apply(lambda x: len(x))
-        self.processed_data['missing_data_count'] = self.processed_data['missing_data_columns'].apply(lambda x: len(x))
-        self.processed_data['proxy_data_count'] = self.processed_data['proxy_data_columns'].apply(lambda x: len(x))
+        # # Calculate counts for primary, missing, and proxy data columns
+        # self.processed_data['primary_data_count'] = self.processed_data['primary_data_columns'].apply(lambda x: len(x))
+        # self.processed_data['missing_data_count'] = self.processed_data['missing_data_columns'].apply(lambda x: len(x))
+        # self.processed_data['proxy_data_count'] = self.processed_data['proxy_data_columns'].apply(lambda x: len(x))
 
         return self.processed_data
 
